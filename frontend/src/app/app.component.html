@@ -1,0 +1,17 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="app.component.css">
+</head>
+
+<div>
+  <header>
+    <po-toolbar p-title="CENTRAL DE OBRIGAÇÕES"></po-toolbar>
+    <button (click)="close()">
+      Voltar
+      <i class="fa fa-chevron-left"></i>
+    </button>
+  </header>
+
+  <!-- <po-menu [p-menus]="menus"></po-menu> -->
+
+  <router-outlet></router-outlet>
+</div>

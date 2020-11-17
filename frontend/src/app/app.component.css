@@ -1,0 +1,32 @@
+@import '~font-awesome/css/font-awesome.css';
+
+header{
+  display: flex;
+}
+
+header button{
+  width: 8vw;
+  height: 50px;
+  background: #0C9ABE;
+  border: 0;
+  border-radius: 8px;
+  color: #FFF8F0;
+  font-weight: 700;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  margin-left: auto;
+  margin-right: 5px;
+  margin-top: 5px;
+  transition: opacity 0.2s;
+}
+
+header button:hover{
+  opacity: 0.7;
+}
+
+div {
+  background: #FBFBFB;
+}
