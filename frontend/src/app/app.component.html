@@ -5,13 +5,7 @@
 <div>
   <header>
     <po-toolbar p-title="CENTRAL DE OBRIGAÇÕES"></po-toolbar>
-    <button (click)="close()">
-      Voltar
-      <i class="fa fa-chevron-left"></i>
-    </button>
+      <i class="fa fa-times-circle fa-2x" (click)="close()"></i>
   </header>
-
-  <!-- <po-menu [p-menus]="menus"></po-menu> -->
-
   <router-outlet></router-outlet>
 </div>

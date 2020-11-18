@@ -1,3 +1,4 @@
+/* eslint-disable import/no-unresolved */
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { despesasDmedAnaliticasViewComponent } from './despesasDmedAnaliticas-view.component';
@@ -8,9 +9,8 @@ describe('despesasDmedAnaliticasViewComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ despesasDmedAnaliticasViewComponent ]
-    })
-    .compileComponents();
+      declarations: [despesasDmedAnaliticasViewComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

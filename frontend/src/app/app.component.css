@@ -4,26 +4,16 @@ header{
   display: flex;
 }
 
-header button{
-  width: 8vw;
-  height: 50px;
-  background: #0C9ABE;
-  border: 0;
-  border-radius: 8px;
-  color: #FFF8F0;
-  font-weight: 700;
-  display: inline-block;
-  text-align: center;
-  text-decoration: none;
-  font-size: 16px;
+header i{
+  color: #0C9ABE;
   cursor: pointer;
   margin-left: auto;
-  margin-right: 5px;
+  margin-right: 17px;
   margin-top: 5px;
   transition: opacity 0.2s;
 }
 
-header button:hover{
+header i:hover{
   opacity: 0.7;
 }
 
