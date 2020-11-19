@@ -23,7 +23,7 @@ export class despesasDmedAnaliticasListComponent {
     detail: '/view/:id',
     edit: '/edit/:id',
     // new: 'despesasdmedanaliticas/new',
-    new: 'new',
+    new: '/new',
     remove: true,
   };
 

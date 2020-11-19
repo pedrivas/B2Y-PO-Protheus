@@ -1,6 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { despesasDmedAnaliticasFormComponent } from './despesasdmedanaliticas-form.component';
+import despesasDmedAnaliticasFormComponent from './despesasdmedanaliticas-form.component';
 
 describe('despesasDmedAnaliticasFormComponent', () => {
   let component: despesasDmedAnaliticasFormComponent;
@@ -8,9 +8,8 @@ describe('despesasDmedAnaliticasFormComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ despesasDmedAnaliticasFormComponent ]
-    })
-    .compileComponents();
+      declarations: [despesasDmedAnaliticasFormComponent],
+    }).compileComponents();
   }));
 
   beforeEach(() => {

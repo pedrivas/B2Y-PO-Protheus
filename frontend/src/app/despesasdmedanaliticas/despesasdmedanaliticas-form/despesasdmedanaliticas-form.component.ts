@@ -6,16 +6,33 @@ import {
   PoPageDynamicEditActions,
   PoPageDynamicEditField,
 } from '@po-ui/ng-templates';
+import {
+  PoLookupColumn,
+  PoDynamicModule,
+  PoDynamicFormField,
+  PoDynamicFormFieldChanged,
+  PoDynamicFormValidation,
+  PoNotificationService,
+} from '@po-ui/ng-components';
+import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.service';
+// import validaCPF from '../../../utils/validaCPF';
 
 @Component({
   selector: 'app-despesasdmedanaliticas-form',
   templateUrl: './despesasdmedanaliticas-form.component.html',
   styleUrls: ['./despesasdmedanaliticas-form.component.css'],
+  providers: [PoDynamicFormRegisterService],
 })
-class despesasDmedAnaliticasFormComponent implements OnInit {
+export class despesasDmedAnaliticasFormComponent implements OnInit {
+  expense = {};
+
+  validateFields: Array<string> = ['titleHolderEnrollment', 'ansOperatorCode'];
+
   title = 'Novo';
 
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
+
+  serviceOperator = `${this.sharedModule.serviceUri}/operatorsDiops`;
 
   readonly actions: PoPageDynamicEditActions = {
     // cancel: '/despesasdmedanaliticas',
@@ -38,60 +55,117 @@ class despesasDmedAnaliticasFormComponent implements OnInit {
     { value: '2', label: 'Transação' },
   ];
 
+  public readonly columns: Array<PoLookupColumn> = [
+    {
+      property: 'registerNumber',
+      label: 'Codigo da Operadora',
+      fieldLabel: true,
+    },
+    { property: 'operatorCnpj', label: 'Cnpj', fieldLabel: true },
+    { property: 'corporateName', label: 'Razão Social', fieldLabel: true },
+  ];
+
   public readonly fields: Array<PoPageDynamicEditField> = [
     {
-      property: 'healthInsurerCode',
+      property: 'ansOperatorCode',
       label: 'Código Operadora ANS',
       key: true,
+      required: true,
+      // searchService: this.serviceOperator,
+      columns: this.columns,
+      fieldLabel: 'registerNumber',
+      fieldValue: 'registerNumber',
+      mask: '999999',
+      gridColumns: 2,
+    },
+    {
+      divider: 'Titular',
+      property: 'titleHolderEnrollment',
+      label: 'Matricula',
+      required: true,
+      key: false,
       gridColumns: 2,
     },
     {
       property: 'ssnHolder',
-      label: 'CPF Titular',
+      label: 'CPF',
       key: true,
+      required: true,
       mask: '999.999.999-99',
       minLength: 14,
       maxLength: 14,
       gridColumns: 2,
     },
     {
-      property: 'titleHolderEnrollment',
-      label: 'Matricula Titular',
+      property: 'holderName',
+      label: 'Nome',
       key: false,
+      gridColumns: 8,
+      pattern: '^[ a-zA-ZÀ-ÿ\u00f1\u00d1]*$',
+      errorMessage: 'Insira somente letras e/ou espaços neste campo.',
     },
     {
-      property: 'holderName',
-      label: 'Nome Titular',
-      key: false,
-      pattern: '^[ a-zA-ZÀ-ÿ\u00f1\u00d1]*$',
+      divider: 'Dependente',
+      property: 'dependentSsn',
+      label: 'CPF',
+      key: true,
+      gridColumns: 2,
     },
-    { property: 'dependentSsn', label: 'CPF Dependente', key: true },
     {
       property: 'dependentEnrollment',
-      label: 'Matrícula Dependente',
+      label: 'Matrícula',
       key: false,
+      gridColumns: 2,
     },
-    { property: 'dependentName', label: 'Nome Dependente', key: true },
+    {
+      property: 'dependentName',
+      label: 'Nome',
+      key: true,
+      gridColumns: 4,
+    },
     {
       property: 'dependentBirthDate',
-      label: 'Dt.Nasicmento Dependente',
+      label: 'Dt.Nasicmento',
       key: true,
+      gridColumns: 2,
     },
     {
       property: 'dependenceRelationships',
       label: 'Relação de Dependência',
       key: false,
+      gridColumns: 2,
     },
-    { property: 'expenseKey', label: 'Chave Despesa', key: true },
-    { property: 'expenseAmount', label: 'Valor Despesa', key: false },
-    { property: 'refundAmount', label: 'Valor Reembolso', key: false },
+    {
+      divider: 'Despesa',
+      property: 'expenseKey',
+      label: 'Chave',
+      key: true,
+    },
+    {
+      property: 'expenseAmount',
+      label: 'Valor Despesa',
+      key: false,
+      gridColumns: 2,
+    },
+    {
+      property: 'refundAmount',
+      label: 'Valor Reembolso',
+      key: false,
+      gridColumns: 2,
+    },
     {
       property: 'previousYearRefundAmt',
       label: 'Vlr Reemb.Ano Anterior',
       key: false,
+      gridColumns: 2,
     },
     { property: 'period', label: 'Competência', key: true },
-    { property: 'providerSsnEin', label: 'CPF/CNPJ Prestador', key: true },
+    {
+      divider: 'Prestador',
+      property: 'providerSsnEin',
+      label: 'CPF/CNPJ Prestador',
+      key: true,
+    },
     { property: 'providerName', label: 'Nome Prestador', key: false },
     { property: 'inclusionTime', label: 'Hora Inclusão', key: false },
     {
@@ -105,6 +179,8 @@ class despesasDmedAnaliticasFormComponent implements OnInit {
   constructor(
     private activatedRoute: ActivatedRoute,
     private sharedModule: SharedModule,
+    public poNotification: PoNotificationService,
+    private registerService: PoDynamicFormRegisterService,
   ) {}
 
   ngOnInit() {
@@ -114,6 +190,25 @@ class despesasDmedAnaliticasFormComponent implements OnInit {
         : 'Novo registro';
     });
   }
-}
 
-export default despesasDmedAnaliticasFormComponent;
+  onChangeFields(
+    changedValue: PoDynamicFormFieldChanged,
+  ): PoDynamicFormValidation {
+    return {
+      value: {
+        ssnHolder: this.registerService.getCPF(
+          changedValue.value.titleHolderEnrollment,
+          changedValue.value.ansOperatorCode,
+        ),
+      },
+      // fields: [
+      //   {
+      //     property: 'city',
+      //     gridColumns: 6,
+      //     options: this.registerService.getCPF(changedValue.value.state),
+      //     disabled: false,
+      //   },
+      // ],
+    };
+  }
+}
