@@ -1,10 +1,10 @@
+<!-- [p-validate]="this.onChangeFields.bind(this)" -->
+
 <po-dynamic-form
   #dynamicForm
-  p-auto-focus="ansOperatorCode"
+  p-auto-focus="healthInsurerCode"
   [p-fields]="fields"
-  [p-validate]="this.onChangeFields.bind(this)"
   [p-validate-fields]="validateFields"
-  [p-value]="expense"
   >
 </po-dynamic-form>
 <div class="po-row">
@@ -12,7 +12,9 @@
     class="po-md-3"
     p-label="Save"
     [p-disabled]="dynamicForm?.form.invalid"
-    (p-click)="poNotification.success('Data saved successfully!'); dynamicForm.form.reset()"
+    (p-click)="handleNewExpense(dynamicForm.form)"
   >
+  <!-- (p-click)="handleNewExpense(dynamicForm.form); dynamicForm.form.reset()" -->
+
   </po-button>
 </div>

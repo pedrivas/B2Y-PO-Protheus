@@ -3,8 +3,7 @@
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import Expense from '../../models/expense.model';
 import { SharedModule } from '../../../shared/shared.module';
 
 @Injectable()
@@ -13,31 +12,27 @@ export class PoDynamicFormRegisterService {
 
   baseURL = `${this.sharedModule.serviceUri}/beneficiaries`;
 
-  // getCPF(matricula: string, operadora: string): Observable<any> {
-  //   return this.http.get(
-  //     `${this.baseURL}/?subscriberId=${matricula}&healthInsurerCode=${operadora}`,
-  //   );
-  // }
+  getCPF(matricula: string, operadora: string) {
+    const response = this.http.get<Expense>(
+      `${this.baseURL}/?subscriberId=${matricula}&healthInsurerCode=${operadora}`,
+      {
+        responseType: 'json',
+      },
+    );
 
-  getCPF(matricula: string, operadora: string): Observable<any> {
-    const response = this.http
-      .get(
-        `${this.baseURL}/?subscriberId=${matricula}&healthInsurerCode=${operadora}`,
-        {
-          responseType: 'json',
-        },
-      )
-      .pipe();
     return response;
   }
 
-  getUserDocument(value) {
-    const cpfField = { property: 'cpf', visible: true };
-    const cnpjField = { property: 'cnpj', visible: true };
-    const document = value.isJuridicPerson ? cnpjField : cpfField;
-
-    return {
-      fields: [document],
-    };
+  async sendForm(form) {
+    const requestData = form.value;
+    this.http
+      .post<Expense>(
+        `${this.sharedModule.serviceUri}/analyticDmedExpenses`,
+        requestData,
+      )
+      .subscribe(
+        response => console.log(response),
+        error => console.log(error),
+      );
   }
 }

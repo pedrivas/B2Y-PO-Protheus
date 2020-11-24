@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { SharedModule } from 'src/shared/shared.module';
+import { from, of, Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import {
   PoPageDynamicEditActions,
@@ -8,12 +10,11 @@ import {
 } from '@po-ui/ng-templates';
 import {
   PoLookupColumn,
-  PoDynamicModule,
-  PoDynamicFormField,
   PoDynamicFormFieldChanged,
   PoDynamicFormValidation,
   PoNotificationService,
 } from '@po-ui/ng-components';
+import Expense from '../../models/expense.model';
 import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.service';
 // import validaCPF from '../../../utils/validaCPF';
 
@@ -24,9 +25,12 @@ import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.serv
   providers: [PoDynamicFormRegisterService],
 })
 export class despesasDmedAnaliticasFormComponent implements OnInit {
-  expense = {};
+  json = {};
 
-  validateFields: Array<string> = ['titleHolderEnrollment', 'ansOperatorCode'];
+  validateFields: Array<string> = [
+    'titleHolderEnrollment',
+    'healthInsurerCode',
+  ];
 
   title = 'Novo';
 
@@ -67,7 +71,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   public readonly fields: Array<PoPageDynamicEditField> = [
     {
-      property: 'ansOperatorCode',
+      property: 'healthInsurerCode',
       label: 'Código Operadora ANS',
       key: true,
       required: true,
@@ -76,7 +80,15 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       fieldLabel: 'registerNumber',
       fieldValue: 'registerNumber',
       mask: '999999',
+      minLength: 6,
+      maxLength: 6,
       gridColumns: 2,
+    },
+    {
+      property: 'exclusionId',
+      label: 'ID Exclusao',
+      key: true,
+      options: this.exclusionId,
     },
     {
       divider: 'Titular',
@@ -84,7 +96,8 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       label: 'Matricula',
       required: true,
       key: false,
-      gridColumns: 2,
+      gridColumns: 3,
+      maxLength: 22,
     },
     {
       property: 'ssnHolder',
@@ -100,8 +113,9 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       property: 'holderName',
       label: 'Nome',
       key: false,
-      gridColumns: 8,
+      gridColumns: 7,
       pattern: '^[ a-zA-ZÀ-ÿ\u00f1\u00d1]*$',
+      maxLength: 70,
       errorMessage: 'Insira somente letras e/ou espaços neste campo.',
     },
     {
@@ -109,6 +123,9 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       property: 'dependentSsn',
       label: 'CPF',
       key: true,
+      mask: '999.999.999-99',
+      minLength: 14,
+      maxLength: 14,
       gridColumns: 2,
     },
     {
@@ -116,63 +133,85 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       label: 'Matrícula',
       key: false,
       gridColumns: 2,
+      maxLength: 22,
     },
     {
       property: 'dependentName',
       label: 'Nome',
       key: true,
       gridColumns: 4,
+      maxLength: 70,
     },
     {
       property: 'dependentBirthDate',
       label: 'Dt.Nasicmento',
       key: true,
       gridColumns: 2,
+      type: 'date',
     },
     {
       property: 'dependenceRelationships',
       label: 'Relação de Dependência',
       key: false,
       gridColumns: 2,
+      maxLength: 2,
+      minLength: 2,
     },
     {
       divider: 'Despesa',
       property: 'expenseKey',
       label: 'Chave',
+      required: true,
       key: true,
+      gridColumns: 4,
+      maxLength: 40,
+      minLength: 40,
     },
     {
       property: 'expenseAmount',
       label: 'Valor Despesa',
       key: false,
       gridColumns: 2,
+      type: 'currency',
+      maxLength: 7,
     },
     {
       property: 'refundAmount',
       label: 'Valor Reembolso',
       key: false,
       gridColumns: 2,
+      type: 'currency',
+      maxLength: 7,
     },
     {
       property: 'previousYearRefundAmt',
       label: 'Vlr Reemb.Ano Anterior',
       key: false,
       gridColumns: 2,
+      type: 'currency',
+      maxLength: 7,
     },
-    { property: 'period', label: 'Competência', key: true },
+    {
+      property: 'period',
+      label: 'Competência',
+      key: true,
+      gridColumns: 2,
+      maxLength: 6,
+      minLength: 6,
+    },
     {
       divider: 'Prestador',
       property: 'providerSsnEin',
       label: 'CPF/CNPJ Prestador',
       key: true,
+      maxLength: 14,
+      minLength: 21,
     },
-    { property: 'providerName', label: 'Nome Prestador', key: false },
-    { property: 'inclusionTime', label: 'Hora Inclusão', key: false },
     {
-      property: 'exclusionId',
-      label: 'ID Exclusao',
-      key: true,
-      options: this.exclusionId,
+      property: 'providerName',
+      label: 'Nome Prestador',
+      key: false,
+      maxLength: 70,
     },
   ];
 
@@ -198,9 +237,18 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       value: {
         ssnHolder: this.registerService.getCPF(
           changedValue.value.titleHolderEnrollment,
-          changedValue.value.ansOperatorCode,
+          changedValue.value.healthInsurerCode,
         ),
+        // .subscribe(
+        //   // eslint-disable-next-line no-return-assign
+        //   data =>
+        //     (this.expense = {
+        //       ssnHolder: (data as any).ssnHolder,
+        //       expenseKey: (data as any).expenseKey,
+        //     }),
+        // ),
       },
+
       // fields: [
       //   {
       //     property: 'city',
@@ -210,5 +258,13 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       //   },
       // ],
     };
+  }
+
+  handleNewExpense(form) {
+    if (this.registerService.sendForm(form)) {
+      alert('deu bom');
+    } else {
+      alert('deu ruim');
+    }
   }
 }
