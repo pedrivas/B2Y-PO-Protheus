@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from 'src/shared/shared.module';
-import { from, of, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
 
 import {
   PoPageDynamicEditActions,
@@ -25,14 +23,18 @@ import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.serv
   providers: [PoDynamicFormRegisterService],
 })
 export class despesasDmedAnaliticasFormComponent implements OnInit {
-  json = {};
+  expenseId: string;
+
+  expense: Expense;
+
+  expenseValues: Expense = {};
+
+  title = 'Inclusão de Despesa';
 
   validateFields: Array<string> = [
     'titleHolderEnrollment',
     'healthInsurerCode',
   ];
-
-  title = 'Novo';
 
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
@@ -55,8 +57,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   public readonly exclusionId: Array<{ value: string; label: string }> = [
     { value: '0', label: 'Não' },
-    { value: '1', label: 'Guia' },
-    { value: '2', label: 'Transação' },
+    { value: '1', label: 'Sim' },
   ];
 
   public readonly columns: Array<PoLookupColumn> = [
@@ -75,7 +76,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       label: 'Código Operadora ANS',
       key: true,
       required: true,
-      // searchService: this.serviceOperator,
+      searchService: this.serviceOperator,
       columns: this.columns,
       fieldLabel: 'registerNumber',
       fieldValue: 'registerNumber',
@@ -88,6 +89,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       property: 'exclusionId',
       label: 'ID Exclusao',
       key: true,
+      required: true,
       options: this.exclusionId,
     },
     {
@@ -195,6 +197,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       property: 'period',
       label: 'Competência',
       key: true,
+      required: true,
       gridColumns: 2,
       maxLength: 6,
       minLength: 6,
@@ -217,17 +220,21 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   constructor(
     private activatedRoute: ActivatedRoute,
+    private route: ActivatedRoute,
+    private router: Router,
     private sharedModule: SharedModule,
     public poNotification: PoNotificationService,
     private registerService: PoDynamicFormRegisterService,
   ) {}
 
   ngOnInit() {
-    this.activatedRoute.params.subscribe(params => {
-      this.title = params.id
-        ? `Editando registro ${params.id}`
-        : 'Novo registro';
+    this.route.paramMap.subscribe(parameters => {
+      this.expenseId = parameters.get('id');
     });
+    if (this.expenseId) {
+      this.title = 'Alteração de Despesa';
+      this.setFormValue();
+    }
   }
 
   onChangeFields(
@@ -261,10 +268,48 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   }
 
   handleNewExpense(form) {
-    if (this.registerService.sendForm(form)) {
-      alert('deu bom');
-    } else {
-      alert('deu ruim');
-    }
+    this.registerService.postNewExpense(form).subscribe(
+      () => {
+        this.poNotification.success('Despesa inserida com Sucesso');
+        this.router.navigate(['/']);
+      },
+      err => this.poNotification.error(err),
+    );
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  // eslint-disable-next-line class-methods-use-this
+  handleUpdateExpense() {
+    alert('update');
+  }
+
+  private setFormValue(): void {
+    this.registerService
+      .getExpense(this.expenseId)
+      .subscribe((expense: Expense) => {
+        this.expenseValues.providerName = expense.providerName;
+        this.expenseValues.inclusionTime = expense.inclusionTime;
+        this.expenseValues.refundAmount = expense.refundAmount;
+        this.expenseValues.exclusionId = expense.exclusionId;
+        this.expenseValues.providerSsnEin = expense.providerSsnEin;
+        this.expenseValues.dependenceRelationships =
+          expense.dependenceRelationships;
+        this.expenseValues.dependentBirthDate = expense.dependentBirthDate;
+        this.expenseValues.expenseAmount = expense.expenseAmount;
+        this.expenseValues.healthInsurerCode = expense.healthInsurerCode;
+        this.expenseValues.ssnHolder = expense.ssnHolder;
+        this.expenseValues.processed = expense.processed;
+        this.expenseValues.previousYearRefundAmt =
+          expense.previousYearRefundAmt;
+        this.expenseValues.titleHolderEnrollment =
+          expense.titleHolderEnrollment;
+        this.expenseValues.holderName = expense.holderName;
+        this.expenseValues.dependentSsn = expense.dependentSsn;
+        this.expenseValues.dependentName = expense.dependentName;
+        this.expenseValues.roboId = expense.roboId;
+        this.expenseValues.dependentEnrollment = expense.dependentEnrollment;
+        this.expenseValues.period = expense.period;
+        this.expenseValues.expenseKey = expense.expenseKey;
+      });
   }
 }

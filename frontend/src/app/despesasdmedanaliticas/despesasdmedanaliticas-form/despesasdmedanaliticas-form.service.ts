@@ -10,7 +10,7 @@ import { SharedModule } from '../../../shared/shared.module';
 export class PoDynamicFormRegisterService {
   constructor(private http: HttpClient, private sharedModule: SharedModule) {}
 
-  baseURL = `${this.sharedModule.serviceUri}/beneficiaries`;
+  baseURL = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
   getCPF(matricula: string, operadora: string) {
     const response = this.http.get<Expense>(
@@ -23,16 +23,19 @@ export class PoDynamicFormRegisterService {
     return response;
   }
 
-  async sendForm(form) {
+  getExpense(expenseKey: string) {
+    return this.http.get<Expense>(`${this.baseURL}/${expenseKey}`);
+  }
+
+  postNewExpense(form) {
     const requestData = form.value;
-    this.http
-      .post<Expense>(
-        `${this.sharedModule.serviceUri}/analyticDmedExpenses`,
-        requestData,
-      )
-      .subscribe(
-        response => console.log(response),
-        error => console.log(error),
-      );
+    return this.http.post(
+      `${this.sharedModule.serviceUri}/analyticDmedExpenses`,
+      requestData,
+    );
+    // .subscribe(
+    //   response => console.log(response),
+    //   error => console.log(error),
+    // );
   }
 }

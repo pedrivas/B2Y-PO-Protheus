@@ -1,9 +1,14 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Component } from '@angular/core';
 import { SharedModule } from 'src/shared/shared.module';
+import { Router } from '@angular/router';
 import {
   PoPageDynamicTableActions,
   PoPageDynamicEditField,
+  PoPageDynamicTableCustomAction,
 } from '@po-ui/ng-templates';
+import { PoTableAction } from '@po-ui/ng-components';
 
 interface EditFieldProps extends PoPageDynamicEditField {
   labels?: Array<{ value: string; label: string; color?: string }>;
@@ -20,12 +25,13 @@ export class despesasDmedAnaliticasListComponent {
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
   readonly actions: PoPageDynamicTableActions = {
-    detail: '/view/:id',
-    edit: '/edit/:id',
-    // new: 'despesasdmedanaliticas/new',
-    new: '/new',
-    remove: true,
+    new: '/form',
   };
+
+  readonly customActions: Array<PoPageDynamicTableCustomAction> = [
+    { label: 'Alterar', action: this.updateExpense.bind(this) },
+    { label: 'Excluir', action: this.deleteExpense.bind(this) },
+  ];
 
   public readonly status: Array<{ value: string; label: string }> = [
     { value: '1', label: 'Valid Pdte' },
@@ -36,8 +42,7 @@ export class despesasDmedAnaliticasListComponent {
 
   public readonly exclusionId: Array<{ value: string; label: string }> = [
     { value: '0', label: 'Não' },
-    { value: '1', label: 'Guia' },
-    { value: '2', label: 'Transação' },
+    { value: '1', label: 'Sim' },
   ];
 
   public readonly recordingType: Array<{ value: string; label: string }> = [
@@ -120,5 +125,13 @@ export class despesasDmedAnaliticasListComponent {
     },
   ];
 
-  constructor(private sharedModule: SharedModule) {}
+  constructor(private sharedModule: SharedModule, private router: Router) {}
+
+  updateExpense(row: any) {
+    this.router.navigate([`/form/${row.expenseKey}`]);
+  }
+
+  deleteExpense() {
+    alert('delete');
+  }
 }

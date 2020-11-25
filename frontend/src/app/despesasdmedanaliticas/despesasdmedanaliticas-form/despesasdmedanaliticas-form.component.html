@@ -1,20 +1,47 @@
-<!-- [p-validate]="this.onChangeFields.bind(this)" -->
+<head>
+  <link rel="stylesheet" type="text/css" href="despesasdmedanaliticas-form.component.css">
+</head>
+<po-page-default [p-title]="title">
 
-<po-dynamic-form
-  #dynamicForm
-  p-auto-focus="healthInsurerCode"
-  [p-fields]="fields"
-  [p-validate-fields]="validateFields"
-  >
-</po-dynamic-form>
-<div class="po-row">
-  <po-button
-    class="po-md-3"
-    p-label="Save"
-    [p-disabled]="dynamicForm?.form.invalid"
-    (p-click)="handleNewExpense(dynamicForm.form)"
-  >
-  <!-- (p-click)="handleNewExpense(dynamicForm.form); dynamicForm.form.reset()" -->
+  <header>
+    <button routerLink="" routerLinkActive="active">
+      Voltar
+      <i
+        class="po-icon po-icon-arrow-left"
+        style="transform: scale(1.5);"
+      >
+      </i>
+    </button>
+  </header>
 
-  </po-button>
-</div>
+  <po-dynamic-form
+    #dynamicForm
+    p-auto-focus="healthInsurerCode"
+    [p-fields]="fields"
+    [p-validate-fields]="validateFields"
+    [p-value]="expenseValues"
+  >
+    <!-- [p-validate]="this.onChangeFields.bind(this)" -->
+  </po-dynamic-form>
+  <div class="post-form">
+    <po-button
+      class="po-md-12"
+      *ngIf="!this.expenseId"
+      p-label="Inserir"
+      [p-disabled]="dynamicForm?.form.invalid"
+      (p-click)="handleNewExpense(dynamicForm.form)"
+      p-type="primary"
+    >
+    </po-button>
+    <po-button
+      class="po-md-12"
+      *ngIf="this.expenseId"
+      p-label="Atualizar"
+      (p-click)="handleUpdateExpense()"
+      p-type="primary"
+    >
+    </po-button>
+  </div>
+
+</po-page-default>
+
