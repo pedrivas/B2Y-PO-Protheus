@@ -97,12 +97,6 @@ export class despesasDmedAnaliticasListComponent {
     { property: 'providerSsnEin', label: 'CPF/CNPJ Prestador', key: true },
     { property: 'providerName', label: 'Nome Prestador', key: false },
     {
-      property: 'recordingType',
-      label: 'Tipo Gravação',
-      key: false,
-      options: this.recordingType,
-    },
-    {
       property: 'processed',
       label: 'Processado',
       key: false,
@@ -113,15 +107,22 @@ export class despesasDmedAnaliticasListComponent {
       property: 'robotProcStartTime',
       label: 'Hora Início proces robo',
       key: false,
+      visible: false,
     },
     { property: 'inclusionDate', label: 'Data Inclusão', key: false },
-    { property: 'robotId', label: 'ID Robo', key: false },
-    { property: 'inclusionTime', label: 'Hora Inclusão', key: false },
+    { property: 'robotId', label: 'ID Robo', key: false, visible: false },
+    {
+      property: 'inclusionTime',
+      label: 'Hora Inclusão',
+      key: false,
+      visible: true,
+    },
     {
       property: 'exclusionId',
       label: 'ID Exclusao',
       key: true,
       options: this.exclusionId,
+      visible: false,
     },
   ];
 
@@ -131,7 +132,7 @@ export class despesasDmedAnaliticasListComponent {
     this.router.navigate([`/form/${row.expenseKey}`]);
   }
 
-  deleteExpense() {
-    alert('delete');
+  deleteExpense(row: any) {
+    this.router.navigate([`/form/${row.expenseKey}/delete`]);
   }
 }

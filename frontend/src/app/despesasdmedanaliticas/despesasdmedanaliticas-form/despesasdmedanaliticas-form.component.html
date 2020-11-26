@@ -20,6 +20,7 @@
     [p-fields]="fields"
     [p-validate-fields]="validateFields"
     [p-value]="expenseValues"
+
   >
     <!-- [p-validate]="this.onChangeFields.bind(this)" -->
   </po-dynamic-form>
@@ -35,12 +36,20 @@
     </po-button>
     <po-button
       class="po-md-12"
-      *ngIf="this.expenseId"
+      *ngIf="this.expenseId && !this.isDelete"
       p-label="Atualizar"
-      (p-click)="handleUpdateExpense()"
+      (p-click)="handleNewExpense(dynamicForm.form)"
       p-type="primary"
     >
     </po-button>
+    <po-button
+    class="po-md-12"
+    *ngIf="this.expenseId && this.isDelete"
+    p-label="Excluir"
+    (p-click)="handleNewExpense(dynamicForm.form)"
+    p-type="primary"
+  >
+  </po-button>
   </div>
 
 </po-page-default>

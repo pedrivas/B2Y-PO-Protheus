@@ -6,6 +6,7 @@ import { despesasDmedAnaliticasFormComponent } from './despesasdmedanaliticas-fo
 
 const routes: Routes = [
   { path: '', component: despesasDmedAnaliticasListComponent },
+  { path: 'form/:id/delete', component: despesasDmedAnaliticasFormComponent },
   { path: 'form/:id', component: despesasDmedAnaliticasFormComponent },
   { path: 'form', component: despesasDmedAnaliticasFormComponent },
 ];

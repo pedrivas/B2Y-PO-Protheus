@@ -1,15 +1,15 @@
+/* eslint-disable class-methods-use-this */
+/* eslint-disable no-plusplus */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from 'src/shared/shared.module';
 
-import {
-  PoPageDynamicEditActions,
-  PoPageDynamicEditField,
-} from '@po-ui/ng-templates';
+import { PoPageDynamicEditField } from '@po-ui/ng-templates';
 import {
   PoLookupColumn,
   PoDynamicFormFieldChanged,
-  PoDynamicFormValidation,
+  PoDynamicFormField,
+  PoDynamicFormFieldValidation,
   PoNotificationService,
 } from '@po-ui/ng-components';
 import Expense from '../../models/expense.model';
@@ -29,24 +29,15 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   expenseValues: Expense = {};
 
+  isDelete: boolean;
+
   title = 'Inclusão de Despesa';
 
-  validateFields: Array<string> = [
-    'titleHolderEnrollment',
-    'healthInsurerCode',
-  ];
+  validateFields: Array<string> = ['healthInsurerCode'];
 
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
   serviceOperator = `${this.sharedModule.serviceUri}/operatorsDiops`;
-
-  readonly actions: PoPageDynamicEditActions = {
-    // cancel: '/despesasdmedanaliticas',
-    cancel: '/',
-    // save: '/despesasdmedanaliticas/edit/:id',
-    save: '/edit/:id',
-    saveNew: '/despesasdmedanaliticas/new',
-  };
 
   public readonly status: Array<{ value: string; label: string }> = [
     { value: '1', label: 'Valid Pdte' },
@@ -70,7 +61,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
     { property: 'corporateName', label: 'Razão Social', fieldLabel: true },
   ];
 
-  public readonly fields: Array<PoPageDynamicEditField> = [
+  public readonly fields: Array<PoDynamicFormField> = [
     {
       property: 'healthInsurerCode',
       label: 'Código Operadora ANS',
@@ -84,6 +75,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       minLength: 6,
       maxLength: 6,
       gridColumns: 2,
+      disabled: false,
     },
     {
       property: 'exclusionId',
@@ -91,6 +83,8 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       key: true,
       required: true,
       options: this.exclusionId,
+      visible: true,
+      disabled: true,
     },
     {
       divider: 'Titular',
@@ -228,59 +222,77 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.expenseValues.exclusionId = '0';
     this.route.paramMap.subscribe(parameters => {
       this.expenseId = parameters.get('id');
     });
-    if (this.expenseId) {
+    this.activatedRoute.url.subscribe(url => {
+      if (url[2].path === 'delete') {
+        this.isDelete = true;
+      }
+    });
+    if (this.expenseId && !this.isDelete) {
       this.title = 'Alteração de Despesa';
       this.setFormValue();
+      this.fields[0].disabled = true;
+      this.fields[1].disabled = true;
+      this.fields[3].disabled = true;
+      this.fields[6].disabled = true;
+      this.fields[8].disabled = true;
+      this.fields[7].disabled = true;
+      this.fields[15].disabled = true;
+      this.fields[10].disabled = true;
+      this.fields[14].disabled = true;
+    } else if (this.expenseId && this.isDelete) {
+      this.title = 'Exclusão de Despesa';
+      this.setFormValue();
+      this.expenseValues.exclusionId = '1';
+      for (let nFields = 0; nFields < this.fields.length; nFields++) {
+        this.fields[nFields].disabled = true;
+      }
     }
   }
 
   onChangeFields(
     changedValue: PoDynamicFormFieldChanged,
-  ): PoDynamicFormValidation {
+  ): PoDynamicFormFieldValidation {
     return {
-      value: {
-        ssnHolder: this.registerService.getCPF(
-          changedValue.value.titleHolderEnrollment,
-          changedValue.value.healthInsurerCode,
-        ),
-        // .subscribe(
-        //   // eslint-disable-next-line no-return-assign
-        //   data =>
-        //     (this.expense = {
-        //       ssnHolder: (data as any).ssnHolder,
-        //       expenseKey: (data as any).expenseKey,
-        //     }),
-        // ),
+      value: '989898',
+      field: {
+        property: 'healthInsurerCode',
+        gridColumns: 6,
       },
-
-      // fields: [
-      //   {
-      //     property: 'city',
-      //     gridColumns: 6,
-      //     options: this.registerService.getCPF(changedValue.value.state),
-      //     disabled: false,
-      //   },
-      // ],
     };
   }
 
+  // onChangeFields(
+  //   changedValue: PoDynamicFormFieldChanged,
+  // ): PoDynamicFormValidation {
+  //   return {
+  //     value: { healthInsurerCode: '989898' },
+  //     fields: [
+  //       {
+  //         property: 'healthInsurerCode',
+  //         gridColumns: 6,
+  //       },
+  //     ],
+  //   };
+  // }
+
   handleNewExpense(form) {
-    this.registerService.postNewExpense(form).subscribe(
+    this.registerService.postExpense(form).subscribe(
       () => {
-        this.poNotification.success('Despesa inserida com Sucesso');
+        if (this.expenseId && !this.isDelete) {
+          this.poNotification.success('Despesa atualizada com Sucesso');
+        } else if (this.expenseId && this.isDelete) {
+          this.poNotification.success('Despesa excluída com Sucesso');
+        } else {
+          this.poNotification.success('Despesa inserida com Sucesso');
+        }
         this.router.navigate(['/']);
       },
       err => this.poNotification.error(err),
     );
-  }
-
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  // eslint-disable-next-line class-methods-use-this
-  handleUpdateExpense() {
-    alert('update');
   }
 
   private setFormValue(): void {
@@ -290,7 +302,11 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
         this.expenseValues.providerName = expense.providerName;
         this.expenseValues.inclusionTime = expense.inclusionTime;
         this.expenseValues.refundAmount = expense.refundAmount;
-        this.expenseValues.exclusionId = expense.exclusionId;
+        if (this.isDelete) {
+          this.expenseValues.exclusionId = '1';
+        } else {
+          this.expenseValues.exclusionId = '0';
+        }
         this.expenseValues.providerSsnEin = expense.providerSsnEin;
         this.expenseValues.dependenceRelationships =
           expense.dependenceRelationships;

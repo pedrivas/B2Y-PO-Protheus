@@ -27,15 +27,11 @@ export class PoDynamicFormRegisterService {
     return this.http.get<Expense>(`${this.baseURL}/${expenseKey}`);
   }
 
-  postNewExpense(form) {
+  postExpense(form) {
     const requestData = form.value;
     return this.http.post(
       `${this.sharedModule.serviceUri}/analyticDmedExpenses`,
       requestData,
     );
-    // .subscribe(
-    //   response => console.log(response),
-    //   error => console.log(error),
-    // );
   }
 }
