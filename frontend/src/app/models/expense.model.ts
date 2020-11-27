@@ -19,6 +19,7 @@ interface Expense {
   dependentEnrollment?: string;
   period?: string;
   expenseKey?: string;
+  inclusionType?: string;
 }
 
 export default Expense;

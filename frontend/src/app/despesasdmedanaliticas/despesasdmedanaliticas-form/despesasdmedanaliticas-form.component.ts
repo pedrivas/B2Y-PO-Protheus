@@ -1,20 +1,14 @@
-/* eslint-disable class-methods-use-this */
-/* eslint-disable no-plusplus */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from 'src/shared/shared.module';
 
-import { PoPageDynamicEditField } from '@po-ui/ng-templates';
 import {
   PoLookupColumn,
-  PoDynamicFormFieldChanged,
   PoDynamicFormField,
-  PoDynamicFormFieldValidation,
   PoNotificationService,
 } from '@po-ui/ng-components';
 import Expense from '../../models/expense.model';
 import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.service';
-// import validaCPF from '../../../utils/validaCPF';
 
 @Component({
   selector: 'app-despesasdmedanaliticas-form',
@@ -38,13 +32,6 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
   serviceOperator = `${this.sharedModule.serviceUri}/operatorsDiops`;
-
-  public readonly status: Array<{ value: string; label: string }> = [
-    { value: '1', label: 'Valid Pdte' },
-    { value: '2', label: 'Válido' },
-    { value: '3', label: 'Criticado' },
-    { value: '4', label: 'Processado' },
-  ];
 
   public readonly exclusionId: Array<{ value: string; label: string }> = [
     { value: '0', label: 'Não' },
@@ -210,6 +197,13 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       key: false,
       maxLength: 70,
     },
+    {
+      property: 'inclusionType',
+      label: 'Tipo de Inclusão',
+      key: true,
+      maxLength: 1,
+      visible: false,
+    },
   ];
 
   constructor(
@@ -222,7 +216,6 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.expenseValues.exclusionId = '0';
     this.route.paramMap.subscribe(parameters => {
       this.expenseId = parameters.get('id');
     });
@@ -247,37 +240,12 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       this.title = 'Exclusão de Despesa';
       this.setFormValue();
       this.expenseValues.exclusionId = '1';
+      // eslint-disable-next-line no-plusplus
       for (let nFields = 0; nFields < this.fields.length; nFields++) {
         this.fields[nFields].disabled = true;
       }
     }
   }
-
-  onChangeFields(
-    changedValue: PoDynamicFormFieldChanged,
-  ): PoDynamicFormFieldValidation {
-    return {
-      value: '989898',
-      field: {
-        property: 'healthInsurerCode',
-        gridColumns: 6,
-      },
-    };
-  }
-
-  // onChangeFields(
-  //   changedValue: PoDynamicFormFieldChanged,
-  // ): PoDynamicFormValidation {
-  //   return {
-  //     value: { healthInsurerCode: '989898' },
-  //     fields: [
-  //       {
-  //         property: 'healthInsurerCode',
-  //         gridColumns: 6,
-  //       },
-  //     ],
-  //   };
-  // }
 
   handleNewExpense(form) {
     this.registerService.postExpense(form).subscribe(

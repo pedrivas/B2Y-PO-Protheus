@@ -28,21 +28,25 @@ export class despesasDmedAnaliticasListComponent {
     new: '/form',
   };
 
-  readonly customActions: Array<PoPageDynamicTableCustomAction> = [
+  readonly tableCustomActions: Array<PoPageDynamicTableCustomAction> = [
     { label: 'Alterar', action: this.updateExpense.bind(this) },
     { label: 'Excluir', action: this.deleteExpense.bind(this) },
   ];
 
-  public readonly status: Array<{ value: string; label: string }> = [
-    { value: '1', label: 'Valid Pdte' },
-    { value: '2', label: 'Válido' },
-    { value: '3', label: 'Criticado' },
-    { value: '4', label: 'Processado' },
+  readonly pageCustomActions: Array<PoPageDynamicTableCustomAction> = [
+    {
+      label: 'Filtrar por intervalo de datas',
+      action: this.updateExpense.bind(this),
+    },
   ];
 
-  public readonly exclusionId: Array<{ value: string; label: string }> = [
-    { value: '0', label: 'Não' },
-    { value: '1', label: 'Sim' },
+  public readonly exclusionId: Array<{
+    value: string;
+    label: string;
+    color?: string;
+  }> = [
+    { value: '0', label: 'Inclusão', color: 'color-10' },
+    { value: '1', label: 'Exclusão', color: 'color-07' },
   ];
 
   public readonly recordingType: Array<{ value: string; label: string }> = [
@@ -61,6 +65,42 @@ export class despesasDmedAnaliticasListComponent {
 
   public readonly fields: Array<EditFieldProps> = [
     { property: 'healthInsurerCode', label: 'Código Operadora ANS', key: true },
+    {
+      property: 'exclusionId',
+      label: 'Tipo Operação',
+      key: true,
+      type: 'label',
+      labels: this.exclusionId,
+      visible: true,
+    },
+    {
+      property: 'processed',
+      label: 'Processado',
+      key: false,
+      type: 'label',
+      labels: this.processed,
+    },
+    {
+      property: 'inclusionDate',
+      label: 'Data Inclusão',
+      key: false,
+    },
+    {
+      property: 'inclusionTime',
+      label: 'Hora Inclusão',
+      key: false,
+      visible: true,
+    },
+
+    { property: 'expenseKey', label: 'Chave Despesa', key: true },
+    { property: 'expenseAmount', label: 'Valor Despesa', key: false },
+    { property: 'refundAmount', label: 'Valor Reembolso', key: false },
+    {
+      property: 'previousYearRefundAmt',
+      label: 'Vlr Reemb.Ano Anterior',
+      key: false,
+    },
+    { property: 'period', label: 'Competência', key: true },
     { property: 'ssnHolder', label: 'CPF Titular', key: true },
     {
       property: 'titleHolderEnrollment',
@@ -85,45 +125,17 @@ export class despesasDmedAnaliticasListComponent {
       label: 'Relação de Dependência',
       key: false,
     },
-    { property: 'expenseKey', label: 'Chave Despesa', key: true },
-    { property: 'expenseAmount', label: 'Valor Despesa', key: false },
-    { property: 'refundAmount', label: 'Valor Reembolso', key: false },
-    {
-      property: 'previousYearRefundAmt',
-      label: 'Vlr Reemb.Ano Anterior',
-      key: false,
-    },
-    { property: 'period', label: 'Competência', key: true },
+
     { property: 'providerSsnEin', label: 'CPF/CNPJ Prestador', key: true },
     { property: 'providerName', label: 'Nome Prestador', key: false },
-    {
-      property: 'processed',
-      label: 'Processado',
-      key: false,
-      type: 'label',
-      labels: this.processed,
-    },
+
     {
       property: 'robotProcStartTime',
       label: 'Hora Início proces robo',
       key: false,
       visible: false,
     },
-    { property: 'inclusionDate', label: 'Data Inclusão', key: false },
     { property: 'robotId', label: 'ID Robo', key: false, visible: false },
-    {
-      property: 'inclusionTime',
-      label: 'Hora Inclusão',
-      key: false,
-      visible: true,
-    },
-    {
-      property: 'exclusionId',
-      label: 'ID Exclusao',
-      key: true,
-      options: this.exclusionId,
-      visible: false,
-    },
   ];
 
   constructor(private sharedModule: SharedModule, private router: Router) {}

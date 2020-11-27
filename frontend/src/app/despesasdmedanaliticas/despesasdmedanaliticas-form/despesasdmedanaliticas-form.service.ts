@@ -1,6 +1,3 @@
-/* eslint-disable default-case */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import Expense from '../../models/expense.model';
@@ -12,23 +9,13 @@ export class PoDynamicFormRegisterService {
 
   baseURL = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
-  getCPF(matricula: string, operadora: string) {
-    const response = this.http.get<Expense>(
-      `${this.baseURL}/?subscriberId=${matricula}&healthInsurerCode=${operadora}`,
-      {
-        responseType: 'json',
-      },
-    );
-
-    return response;
-  }
-
   getExpense(expenseKey: string) {
     return this.http.get<Expense>(`${this.baseURL}/${expenseKey}`);
   }
 
   postExpense(form) {
     const requestData = form.value;
+    requestData.inclusionType = '1';
     return this.http.post(
       `${this.sharedModule.serviceUri}/analyticDmedExpenses`,
       requestData,
