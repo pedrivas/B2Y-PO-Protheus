@@ -1,10 +1,53 @@
-<po-page-dynamic-table
-  [p-title]="title"
-  [p-service-api]="serviceApi"
-  [p-actions]="actions"
-  [p-table-custom-actions]="tableCustomActions"
-  [p-page-custom-actions]="pageCustomActions"
-  [p-fields]="fields"
-  p-keep-filters="true"
-  >
-</po-page-dynamic-table>
+<po-page-default
+  p-title="DMED - Despesas Detalhadas"
+  [p-actions]="pageActions"
+>
+  <div class="body">
+    <div class="tableHeader">
+      <form #filterForm="ngForm">
+        <po-datepicker-range
+          class= "po-md-3"
+          p-clean="true"
+          p-help="string"
+          p-help="Intervalo de datas"
+          p-placeholder="string"
+          name="formDate"
+          [(ngModel)]="formDate"
+        >
+        </po-datepicker-range>
+        <po-input
+          class= "po-md-2"
+          p-mask="999.999.999-99"
+          p-clean="true"
+          p-maxlength="14"
+          p-minlength="14"
+          p-help="CPF Titular"
+          name="formSsnHolder"
+          [(ngModel)]="formSsnHolder"
+        >
+        </po-input>
+        <po-input
+          class= "po-md-4"
+          p-maxlength="40"
+          p-clean="true"
+          p-help="Chave Despesa"
+          name="formExpenseKey"
+          [(ngModel)]="formExpenseKey"
+        >
+        </po-input>
+      </form>
+      <button (click)="filterExpenseList()" >
+        <i class="po-icon po-icon-filter"></i> Filtrar
+      </button>
+    </div>
+    <po-table
+      [p-items]="filteredExpenseList"
+      [p-actions]="tableActions"
+      [p-columns]="columns"
+      p-keep-filters="true"
+      p-sort="true"
+      (p-show-more)="showMore()"
+      >
+    </po-table>
+  </div>
+</po-page-default>

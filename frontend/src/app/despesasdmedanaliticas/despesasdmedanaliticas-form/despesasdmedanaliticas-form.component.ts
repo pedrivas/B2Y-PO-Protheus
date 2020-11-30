@@ -218,6 +218,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(parameters => {
       this.expenseId = parameters.get('id');
+      this.expenseValues.exclusionId = '0';
     });
     this.activatedRoute.url.subscribe(url => {
       if (url[2].path === 'delete') {
