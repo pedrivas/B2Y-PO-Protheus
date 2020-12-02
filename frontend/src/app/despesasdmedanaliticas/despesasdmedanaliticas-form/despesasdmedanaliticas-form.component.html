@@ -18,11 +18,10 @@
     #dynamicForm
     p-auto-focus="healthInsurerCode"
     [p-fields]="fields"
-    [p-validate-fields]="validateFields"
     [p-value]="expenseValues"
-
   >
-    <!-- [p-validate]="this.onChangeFields.bind(this)" -->
+    <!-- [p-validate-fields]="validateFields" -->
+    <!--     [p-validate]="this.validateForm.bind(this)"-->
   </po-dynamic-form>
   <div class="post-form">
     <po-button

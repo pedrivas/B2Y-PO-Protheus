@@ -5,16 +5,30 @@
   <div class="body">
     <div class="tableHeader">
       <form #filterForm="ngForm">
-        <po-datepicker-range
-          class= "po-md-3"
+        <po-input
+          class= "po-md-1"
+          p-maxlength="6"
+          p-minlength="6"
           p-clean="true"
-          p-help="string"
-          p-help="Intervalo de datas"
-          p-placeholder="string"
-          name="formDate"
-          [(ngModel)]="formDate"
+          p-help="Operadora"
+          name="formOperator"
+          [(ngModel)]="formOperator"
         >
-        </po-datepicker-range>
+        </po-input>
+        <po-datepicker
+          class= "po-md-2"
+          p-help="Data De"
+          name="formDateFrom"
+          [(ngModel)]="formDateFrom"
+        >
+        </po-datepicker>
+        <po-datepicker
+        class= "po-md-2"
+        p-help="Data Até"
+        name="formDateTo"
+        [(ngModel)]="formDateTo"
+      >
+      </po-datepicker>
         <po-input
           class= "po-md-2"
           p-mask="999.999.999-99"

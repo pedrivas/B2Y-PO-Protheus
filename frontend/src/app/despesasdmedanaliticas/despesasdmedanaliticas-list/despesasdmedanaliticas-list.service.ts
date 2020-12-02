@@ -11,14 +11,19 @@ export class ExpenseListService {
 
   baseURL = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
+  filters = '';
+
   expenseList = [];
 
   getExpense(): Observable<any> {
     return this.http.get(`${this.baseURL}?page=1&pageSize=10`);
   }
 
-  loadMoreExpense(quantity: number): Observable<any> {
-    return this.http.get(`${this.baseURL}?page=1&pageSize=${quantity}`);
+  loadMoreExpense(filters, quantity: number): Observable<any> {
+    this.setFilters(filters);
+    return this.http.get(
+      `${this.baseURL}?page=1&pageSize=${quantity}${this.filters}`,
+    );
   }
 
   postExpense(form) {
@@ -30,15 +35,25 @@ export class ExpenseListService {
     );
   }
 
-  filterExpense(filters, quantity) {
-    let queryParams = '';
+  setFilters(filters) {
+    this.filters = '';
     if (filters) {
       if (filters.ssnHolder) {
-        queryParams += `&ssnHolder=${filters.ssnHolder}`;
+        this.filters += `&ssnHolder=${filters.ssnHolder}`;
+      }
+      if (filters.expenseKey) {
+        this.filters += `&expenseKey=${filters.expenseKey}`;
+      }
+      if (filters.operator) {
+        this.filters += `&healthInsurerCode=${filters.operator}`;
       }
     }
+  }
+
+  filterExpense(filters, quantity): Observable<any> {
+    this.setFilters(filters);
     return this.http.get(
-      `${this.baseURL}?page=1&pageSize=${quantity}${filters}`,
+      `${this.baseURL}?page=1&pageSize=${quantity}${this.filters}`,
     );
   }
 }

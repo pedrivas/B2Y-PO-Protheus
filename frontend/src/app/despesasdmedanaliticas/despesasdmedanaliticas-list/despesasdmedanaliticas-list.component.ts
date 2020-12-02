@@ -9,6 +9,7 @@ import {
   PoTableAction,
   PoTableColumn,
   PoPageAction,
+  PoNotificationService,
 } from '@po-ui/ng-components';
 import Expense from '../../models/expense.model';
 import { ExpenseListService } from './despesasdmedanaliticas-list.service';
@@ -30,19 +31,17 @@ export class despesasDmedAnaliticasListComponent {
 
   formValues = [];
 
-  formDate = '';
+  formOperator = '';
+
+  formDateFrom = '';
+
+  formDateTo = '';
 
   formSsnHolder = '';
 
   formExpenseKey = '';
 
-  inputCPF = '';
-
-  inicialDate = '';
-
-  finalDate = '';
-
-  range: string;
+  filters = {};
 
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
@@ -80,6 +79,15 @@ export class despesasDmedAnaliticasListComponent {
     { value: '1', label: 'Exclusão', color: 'color-07' },
   ];
 
+  public readonly inclusionType: Array<{
+    value: string;
+    label: string;
+    color?: string;
+  }> = [
+    { value: '1', label: 'Manual', color: 'color-02' },
+    { value: '2', label: 'Automática', color: 'color-11' },
+  ];
+
   public readonly recordingType: Array<{ value: string; label: string }> = [
     { value: '1', label: 'Manual' },
     { value: '2', label: 'Automático' },
@@ -95,7 +103,7 @@ export class despesasDmedAnaliticasListComponent {
   ];
 
   public readonly columns: Array<PoTableColumn> = [
-    { property: 'healthInsurerCode', label: 'Código Operadora ANS' },
+    { property: 'healthInsurerCode', label: 'Operadora' },
     {
       property: 'exclusionId',
       label: 'Tipo Operação',
@@ -150,6 +158,12 @@ export class despesasDmedAnaliticasListComponent {
 
     { property: 'providerSsnEin', label: 'CPF/CNPJ Prestador' },
     { property: 'providerName', label: 'Nome Prestador' },
+    {
+      property: 'inclusionType',
+      label: 'Gravação',
+      type: 'label',
+      labels: this.inclusionType,
+    },
 
     {
       property: 'robotProcStartTime',
@@ -163,21 +177,35 @@ export class despesasDmedAnaliticasListComponent {
     private sharedModule: SharedModule,
     private router: Router,
     private expenseListService: ExpenseListService,
+    public poNotification: PoNotificationService,
   ) {}
 
   ngOnInit() {
     this.expenseListService.getExpense().subscribe(response => {
       this.expenseList = response.items;
+      this.formatDateHour();
       this.filteredExpenseList = this.expenseList;
     });
   }
 
   updateExpense(row: any) {
-    this.router.navigate([`/form/${row.expenseKey}`]);
+    if (row.inclusionType === '1') {
+      this.router.navigate([`/form/${row.expenseKey}`]);
+    } else {
+      this.poNotification.error(
+        'Não é possível alterar uma gravação automática',
+      );
+    }
   }
 
   deleteExpense(row: any) {
-    this.router.navigate([`/form/${row.expenseKey}/delete`]);
+    if (row.inclusionType === '1') {
+      this.router.navigate([`/form/${row.expenseKey}/delete`]);
+    } else {
+      this.poNotification.error(
+        'Não é possível excluir uma gravação automática',
+      );
+    }
   }
 
   inserir() {
@@ -186,20 +214,53 @@ export class despesasDmedAnaliticasListComponent {
 
   showMore() {
     this.registersQuantity += 10;
+    this.getFilters();
     this.expenseListService
-      .loadMoreExpense(this.registersQuantity)
+      .loadMoreExpense(this.filters, this.registersQuantity)
       .subscribe(response => {
         this.expenseList = response.items;
+        this.formatDateHour();
+        this.filteredExpenseList = this.expenseList;
       });
   }
 
-  filterExpenseList() {
-    const filters = {
-      dateFrom: this.formDate.start,
-      dateTo: this.formDate.end,
+  getFilters() {
+    this.filters = {
+      operator: this.formOperator,
+      dateFrom: this.formDateFrom,
+      dateTo: this.formDateTo,
       ssnHolder: this.formSsnHolder,
       expenseKey: this.formExpenseKey,
     };
-    this.expenseListService.filterExpense(filters, this.registersQuantity);
+  }
+
+  filterExpenseList() {
+    this.getFilters();
+    this.expenseListService
+      .filterExpense(this.filters, this.registersQuantity)
+      .subscribe(response => {
+        this.expenseList = response.items;
+        this.formatDateHour();
+        this.filteredExpenseList = this.expenseList;
+      });
+  }
+
+  formatDateHour() {
+    let formatedDate = '';
+    let formatedHour = '';
+    this.expenseList.forEach((expense, index) => {
+      formatedDate = this.expenseList[index].inclusionDate;
+      formatedDate = `${formatedDate.substr(6, 2)}/${formatedDate.substr(
+        4,
+        2,
+      )}/${formatedDate.substr(0, 4)}`;
+      formatedHour = this.expenseList[index].inclusionTime;
+      formatedHour = `${formatedHour.substr(0, 2)}:${formatedHour.substr(
+        2,
+        2,
+      )}:${formatedHour.substr(4, 2)}`;
+      this.expenseList[index].inclusionDate = formatedDate;
+      this.expenseList[index].inclusionTime = formatedHour;
+    });
   }
 }

@@ -20,6 +20,7 @@ interface Expense {
   period?: string;
   expenseKey?: string;
   inclusionType?: string;
+  inclusionDate?: string;
 }
 
 export default Expense;

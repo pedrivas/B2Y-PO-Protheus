@@ -9,12 +9,18 @@ export class PoDynamicFormRegisterService {
 
   baseURL = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
+  existsExpenseKey;
+
   getExpense(expenseKey: string) {
     return this.http.get<Expense>(`${this.baseURL}/${expenseKey}`);
   }
 
-  postExpense(form) {
+  postExpense(form, isDelete?) {
     const requestData = form.value;
+    requestData.exclusionId = '0';
+    if (isDelete) {
+      requestData.exclusionId = '1';
+    }
     requestData.inclusionType = '1';
     return this.http.post(
       `${this.sharedModule.serviceUri}/analyticDmedExpenses`,

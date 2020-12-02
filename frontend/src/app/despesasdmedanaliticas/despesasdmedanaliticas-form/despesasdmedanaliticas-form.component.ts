@@ -6,6 +6,8 @@ import {
   PoLookupColumn,
   PoDynamicFormField,
   PoNotificationService,
+  PoDynamicFormValidation,
+  PoDynamicFormFieldChanged,
 } from '@po-ui/ng-components';
 import Expense from '../../models/expense.model';
 import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.service';
@@ -27,7 +29,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   title = 'Inclusão de Despesa';
 
-  validateFields: Array<string> = ['healthInsurerCode'];
+  validateFields: Array<string> = ['expenseKey'];
 
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
@@ -70,7 +72,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       key: true,
       required: true,
       options: this.exclusionId,
-      visible: true,
+      visible: false,
       disabled: true,
     },
     {
@@ -179,6 +181,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       label: 'Competência',
       key: true,
       required: true,
+      mask: '999999',
       gridColumns: 2,
       maxLength: 6,
       minLength: 6,
@@ -218,7 +221,6 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   ngOnInit() {
     this.route.paramMap.subscribe(parameters => {
       this.expenseId = parameters.get('id');
-      this.expenseValues.exclusionId = '0';
     });
     this.activatedRoute.url.subscribe(url => {
       if (url[2].path === 'delete') {
@@ -240,7 +242,6 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
     } else if (this.expenseId && this.isDelete) {
       this.title = 'Exclusão de Despesa';
       this.setFormValue();
-      this.expenseValues.exclusionId = '1';
       // eslint-disable-next-line no-plusplus
       for (let nFields = 0; nFields < this.fields.length; nFields++) {
         this.fields[nFields].disabled = true;
@@ -249,7 +250,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   }
 
   handleNewExpense(form) {
-    this.registerService.postExpense(form).subscribe(
+    this.registerService.postExpense(form, this.isDelete).subscribe(
       () => {
         if (this.expenseId && !this.isDelete) {
           this.poNotification.success('Despesa atualizada com Sucesso');
@@ -271,11 +272,6 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
         this.expenseValues.providerName = expense.providerName;
         this.expenseValues.inclusionTime = expense.inclusionTime;
         this.expenseValues.refundAmount = expense.refundAmount;
-        if (this.isDelete) {
-          this.expenseValues.exclusionId = '1';
-        } else {
-          this.expenseValues.exclusionId = '0';
-        }
         this.expenseValues.providerSsnEin = expense.providerSsnEin;
         this.expenseValues.dependenceRelationships =
           expense.dependenceRelationships;
@@ -297,4 +293,31 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
         this.expenseValues.expenseKey = expense.expenseKey;
       });
   }
+
+  // eslint-disable-next-line class-methods-use-this
+  // validateForm(
+  //   changeValue: PoDynamicFormFieldChanged,
+  // ): PoDynamicFormValidation {
+  //   let existsExpenseId;
+  //   let returnObject: PoDynamicFormValidation;
+  //   this.registerService
+  //     .getExpense(changeValue.value.expenseKey)
+  //     .subscribe((expense: Expense) => {
+  //       existsExpenseId = expense.expenseKey;
+  //       if (existsExpenseId) {
+  //         returnObject = {
+  //           value: { expenseKey: '' },
+  //           fields: [
+  //             {
+  //               property: 'expenseKey',
+  //               gridColumns: 6,
+  //               disabled: false,
+  //             },
+  //           ],
+  //         };
+  //         return returnObject;
+  //       }
+  //     });
+  //   return returnObject;
+  // }
 }
