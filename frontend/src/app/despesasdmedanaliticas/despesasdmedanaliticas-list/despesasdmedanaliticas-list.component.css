@@ -7,8 +7,9 @@
 .tableHeader button{
   width: 100px;
   height: 40px;
-  margin-left: 23px;
-  margin-top: 25px;
+  margin-left: 10px;
+  margin-top: 22px;
+  margin-bottom: 5px;
   background: #0C9ABE;
   border: 0;
   border-radius: 8px;

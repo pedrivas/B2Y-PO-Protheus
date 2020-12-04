@@ -47,6 +47,12 @@ export class ExpenseListService {
       if (filters.operator) {
         this.filters += `&healthInsurerCode=${filters.operator}`;
       }
+      if (filters.dateFrom) {
+        this.filters += `&inicialDate=${filters.dateFrom}`;
+      }
+      if (filters.dateTo) {
+        this.filters += `&finalDate=${filters.dateTo}`;
+      }
     }
   }
 

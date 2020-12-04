@@ -27,6 +27,12 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
 
   isDelete: boolean;
 
+  isInsert: boolean;
+
+  checkedExpenseKey = '';
+
+  expenseKeyAlreadyExists = false;
+
   title = 'Inclusão de Despesa';
 
   validateFields: Array<string> = ['expenseKey'];
@@ -223,8 +229,10 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       this.expenseId = parameters.get('id');
     });
     this.activatedRoute.url.subscribe(url => {
-      if (url[2].path === 'delete') {
+      if (url.length === 3) {
         this.isDelete = true;
+      } else if (url.length === 1) {
+        this.isInsert = true;
       }
     });
     if (this.expenseId && !this.isDelete) {
@@ -250,19 +258,25 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
   }
 
   handleNewExpense(form) {
-    this.registerService.postExpense(form, this.isDelete).subscribe(
-      () => {
-        if (this.expenseId && !this.isDelete) {
-          this.poNotification.success('Despesa atualizada com Sucesso');
-        } else if (this.expenseId && this.isDelete) {
-          this.poNotification.success('Despesa excluída com Sucesso');
-        } else {
-          this.poNotification.success('Despesa inserida com Sucesso');
-        }
-        this.router.navigate(['/']);
-      },
-      err => this.poNotification.error(err),
-    );
+    if ((!this.expenseKeyAlreadyExists && this.isInsert) || !this.isInsert) {
+      this.registerService.postExpense(form, this.isDelete).subscribe(
+        () => {
+          if (this.expenseId && !this.isDelete) {
+            this.poNotification.success('Despesa atualizada com Sucesso');
+          } else if (this.expenseId && this.isDelete) {
+            this.poNotification.success('Despesa excluída com Sucesso');
+          } else {
+            this.poNotification.success('Despesa inserida com Sucesso');
+          }
+          this.router.navigate(['/']);
+        },
+        err => this.poNotification.error(err),
+      );
+    } else {
+      this.poNotification.error(
+        'Não é possível inserir uma despesa que já existe',
+      );
+    }
   }
 
   private setFormValue(): void {
@@ -291,6 +305,18 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
         this.expenseValues.dependentEnrollment = expense.dependentEnrollment;
         this.expenseValues.period = expense.period;
         this.expenseValues.expenseKey = expense.expenseKey;
+      });
+  }
+
+  validateInsert() {
+    this.expenseKeyAlreadyExists = false;
+    this.registerService
+      .getExpense(this.expenseValues.expenseKey)
+      .subscribe((expense: Expense) => {
+        this.checkedExpenseKey = expense.expenseKey;
+        if (this.checkedExpenseKey) {
+          this.expenseKeyAlreadyExists = true;
+        }
       });
   }
 

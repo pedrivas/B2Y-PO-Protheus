@@ -43,6 +43,10 @@ export class despesasDmedAnaliticasListComponent {
 
   filters = {};
 
+  filterDateFrom = '';
+
+  filterDateTo = '';
+
   serviceApi = `${this.sharedModule.serviceUri}/analyticDmedExpenses`;
 
   expenseList: Array<Expense> = [];
@@ -225,10 +229,11 @@ export class despesasDmedAnaliticasListComponent {
   }
 
   getFilters() {
+    this.formatFilterDate();
     this.filters = {
       operator: this.formOperator,
-      dateFrom: this.formDateFrom,
-      dateTo: this.formDateTo,
+      dateFrom: this.filterDateFrom,
+      dateTo: this.filterDateTo,
       ssnHolder: this.formSsnHolder,
       expenseKey: this.formExpenseKey,
     };
@@ -262,5 +267,22 @@ export class despesasDmedAnaliticasListComponent {
       this.expenseList[index].inclusionDate = formatedDate;
       this.expenseList[index].inclusionTime = formatedHour;
     });
+  }
+
+  formatFilterDate() {
+    this.filterDateFrom = '';
+    this.filterDateTo = '';
+    if (this.formDateFrom) {
+      this.filterDateFrom =
+        this.formDateFrom.substr(0, 4) +
+        this.formDateFrom.substr(5, 2) +
+        this.formDateFrom.substr(8, 2);
+    }
+    if (this.formDateTo) {
+      this.filterDateTo =
+        this.formDateTo.substr(0, 4) +
+        this.formDateTo.substr(5, 2) +
+        this.formDateTo.substr(8, 2);
+    }
   }
 }
