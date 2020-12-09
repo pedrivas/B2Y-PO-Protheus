@@ -1,0 +1,7 @@
+{
+  "name": "Protheus Portinari",
+  "version": "12.27.0",
+  "serverBackend": "/",
+  "restEntryPoint": "api",
+  "versionAPI": "v1"
+}

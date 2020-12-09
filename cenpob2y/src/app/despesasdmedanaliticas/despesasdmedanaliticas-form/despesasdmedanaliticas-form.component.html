@@ -1,0 +1,60 @@
+<head>
+  <link rel="stylesheet" type="text/css" href="despesasdmedanaliticas-form.component.css">
+</head>
+<po-page-default [p-title]="title">
+
+  <div class="post-form">
+    <po-button
+      style="margin-right: 10px;margin-left: auto;"
+      p-label="Cancelar"
+      routerLink="" routerLinkActive="active"
+      p-type="default"
+    >
+    </po-button>
+    <po-button
+      style="margin-right: 10px;"
+      p-label="Salvar e Novo"
+      *ngIf="!this.expenseId"
+      [p-disabled]="dynamicForm?.form.invalid"
+      (p-click)="handleNewExpense(dynamicForm.form,true);dynamicForm.form.reset()"
+      p-type="default"
+    >
+    </po-button>
+    <po-button
+      *ngIf="!this.expenseId"
+      p-label="Salvar"
+      [p-disabled]="dynamicForm?.form.invalid"
+      (p-click)="handleNewExpense(dynamicForm.form,false)"
+      p-type="primary"
+    >
+    </po-button>
+    <po-button
+      *ngIf="this.expenseId && !this.isDelete"
+      p-label="Atualizar"
+      (p-click)="handleNewExpense(dynamicForm.form,false)"
+      p-type="primary"
+    >
+    </po-button>
+    <po-button
+    *ngIf="this.expenseId && this.isDelete"
+    p-label="Excluir"
+    (p-click)="handleNewExpense(dynamicForm.form,false)"
+    p-type="primary"
+  >
+  </po-button>
+  </div>
+
+  <po-dynamic-form
+    #dynamicForm
+    p-auto-focus="healthInsurerCode"
+    [p-fields]="fields"
+    [p-value]="expenseValues"
+    [p-validate-fields]="validateFields"
+    [p-validate]="this.validateInsert.bind(this)"
+  >
+
+  </po-dynamic-form>
+
+
+</po-page-default>
+
