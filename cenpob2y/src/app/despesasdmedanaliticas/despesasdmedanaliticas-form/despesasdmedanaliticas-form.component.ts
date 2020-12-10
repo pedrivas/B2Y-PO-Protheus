@@ -249,7 +249,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       this.fields[0].disabled = true;
       this.fields[1].disabled = true;
       this.fields[3].disabled = true;
-      this.fields[6].disabled = true;
+      this.fields[5].disabled = true;
       this.fields[8].disabled = true;
       this.fields[7].disabled = true;
       this.fields[15].disabled = true;
