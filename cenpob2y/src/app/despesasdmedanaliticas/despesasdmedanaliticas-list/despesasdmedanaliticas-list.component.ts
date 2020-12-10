@@ -136,17 +136,18 @@ export class despesasDmedAnaliticasListComponent {
       visible: false,
     },
 
-    { property: 'expenseKey', label: 'Chave Despesa' },
     { property: 'ssnHolder', label: 'CPF Titular' },
     {
       property: 'titleHolderEnrollment',
       label: 'Matricula Titular',
+      visible: false,
     },
     { property: 'holderName', label: 'Nome Titular' },
     { property: 'dependentSsn', label: 'CPF Dependente' },
     {
       property: 'dependentEnrollment',
       label: 'Matrícula Dependente',
+      visible: false,
     },
     { property: 'dependentName', label: 'Nome Dependente' },
     {
@@ -161,6 +162,7 @@ export class despesasDmedAnaliticasListComponent {
       labels: this.dependenceRelationships,
       visible: false,
     },
+    { property: 'expenseKey', label: 'Chave Despesa' },
     { property: 'expenseAmount', label: 'Valor Despesa' },
     { property: 'refundAmount', label: 'Valor Reembolso' },
     {

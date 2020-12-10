@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SharedModule } from 'src/shared/shared.module';
@@ -7,7 +8,9 @@ import {
   PoDynamicFormField,
   PoNotificationService,
   PoPageAction,
+  PoDynamicFormFieldValidation,
 } from '@po-ui/ng-components';
+import { CheckboxControlValueAccessor } from '@angular/forms';
 import Expense from '../../models/expense.model';
 import { PoDynamicFormRegisterService } from './despesasdmedanaliticas-form.service';
 
@@ -166,6 +169,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       gridColumns: 2,
       type: 'currency',
       maxLength: 7,
+      validate: this.checkValues.bind(this),
     },
     {
       property: 'refundAmount',
@@ -174,6 +178,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       gridColumns: 2,
       type: 'currency',
       maxLength: 7,
+      validate: this.checkValues.bind(this),
     },
     {
       property: 'previousYearRefundAmt',
@@ -182,6 +187,7 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
       gridColumns: 2,
       type: 'currency',
       maxLength: 7,
+      validate: this.checkValues.bind(this),
     },
     {
       property: 'period',
@@ -322,5 +328,26 @@ export class despesasDmedAnaliticasFormComponent implements OnInit {
           this.expenseKeyAlreadyExists = true;
         }
       });
+  }
+
+  checkValues(changeValue) {
+    if (changeValue.property === 'expenseAmount') {
+      if (changeValue.value) {
+        this.fields[12].disabled = true;
+        this.fields[13].disabled = true;
+      } else {
+        this.fields[12].disabled = false;
+        this.fields[13].disabled = false;
+      }
+    } else if (
+      changeValue.property === 'refundAmount' ||
+      changeValue.property === 'previousYearRefundAmt'
+    ) {
+      if (changeValue.value) {
+        this.fields[11].disabled = true;
+      } else {
+        this.fields[11].disabled = false;
+      }
+    }
   }
 }
